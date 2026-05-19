@@ -20,7 +20,7 @@ namespace Reflex.Editor.DebuggingWindow
         private const string InstanceIcon = "d_Prefab Icon"; // "d_Prefab Icon", "d_Prefab On Icon"
 
         [NonSerialized] private bool _isInitialized;
-        [SerializeField] private TreeViewState _treeViewState; // Serialized in the window layout file so it survives assembly reloading
+        [SerializeField] private TreeViewState<int> _treeViewState; // Serialized in the window layout file so it survives assembly reloading
         [SerializeField] private MultiColumnHeaderState _multiColumnHeaderState;
 
         private int _id = -1;
@@ -69,7 +69,7 @@ namespace Reflex.Editor.DebuggingWindow
             {
                 // Check if it already exists (deserialized from window layout file or scriptable object)
                 if (_treeViewState == null)
-                    _treeViewState = new TreeViewState();
+                    _treeViewState = new TreeViewState<int>();
 
                 bool firstInit = _multiColumnHeaderState == null;
                 var headerState = MultiColumnTreeView.CreateDefaultMultiColumnHeaderState();

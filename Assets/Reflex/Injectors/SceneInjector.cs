@@ -11,7 +11,27 @@ namespace Reflex.Injectors
         {
             using var pooledObject1 = ListPool<GameObject>.Get(out var rootGameObjects);
             scene.GetRootGameObjects(rootGameObjects);
-            GameObjectInjector.InjectRecursiveMany(rootGameObjects, container);
+
+            for (var i = 0; i < rootGameObjects.Count; i++)
+            {
+                InjectHierarchy(rootGameObjects[i].transform, container);
+            }
+        }
+
+        private static void InjectHierarchy(Transform current, Container container)
+        {
+            if (current == null)
+                return;
+
+            if (current.TryGetComponent<InjectionBoundary>(out _))
+                return;
+
+            GameObjectInjector.InjectObject(current.gameObject, container);
+
+            for (var i = 0; i < current.childCount; i++)
+            {
+                InjectHierarchy(current.GetChild(i), container);
+            }
         }
     }
 }

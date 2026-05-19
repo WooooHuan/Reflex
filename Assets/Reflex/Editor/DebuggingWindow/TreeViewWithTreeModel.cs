@@ -6,12 +6,12 @@ using UnityEditor.IMGUI.Controls;
 
 namespace Reflex.Editor.DebuggingWindow
 {
-    internal class TreeViewWithTreeModel<T> : TreeView where T : TreeElement
+    internal class TreeViewWithTreeModel<T> : TreeView<int> where T : TreeElement
     {
         private TreeModel<T> _treeModel;
-        private readonly List<TreeViewItem> _rows = new List<TreeViewItem>(100);
+        private readonly List<TreeViewItem<int>> _rows = new List<TreeViewItem<int>>(100);
 
-        public TreeViewWithTreeModel(TreeViewState state, MultiColumnHeader multiColumnHeader, TreeModel<T> model) : base(state, multiColumnHeader)
+        public TreeViewWithTreeModel(TreeViewState<int> state, MultiColumnHeader multiColumnHeader, TreeModel<T> model) : base(state, multiColumnHeader)
         {
             Init(model);
         }
@@ -26,13 +26,13 @@ namespace Reflex.Editor.DebuggingWindow
             return _treeModel.Find(id);
         }
 
-        protected override TreeViewItem BuildRoot()
+        protected override TreeViewItem<int> BuildRoot()
         {
             int depthForHiddenRoot = -1;
-            return new TreeViewItem<T>(_treeModel.Root.Id, depthForHiddenRoot, _treeModel.Root.Name, _treeModel.Root);
+            return new TreeViewDataItem<T>(_treeModel.Root.Id, depthForHiddenRoot, _treeModel.Root.Name, _treeModel.Root);
         }
 
-        protected override IList<TreeViewItem> BuildRows(TreeViewItem root)
+        protected override IList<TreeViewItem<int>> BuildRows(TreeViewItem<int> root)
         {
             if (_treeModel.Root == null)
             {
@@ -59,11 +59,11 @@ namespace Reflex.Editor.DebuggingWindow
             return _rows;
         }
 
-        private void AddChildrenRecursive(T parent, int depth, IList<TreeViewItem> newRows)
+        private void AddChildrenRecursive(T parent, int depth, IList<TreeViewItem<int>> newRows)
         {
             foreach (T child in parent.Children)
             {
-                var item = new TreeViewItem<T>(child.Id, depth, child.Name, child);
+                var item = new TreeViewDataItem<T>(child.Id, depth, child.Name, child);
                 newRows.Add(item);
 
                 if (child.HasChildren)
@@ -80,7 +80,7 @@ namespace Reflex.Editor.DebuggingWindow
             }
         }
 
-        private static void Search(T searchFromThis, string search, List<TreeViewItem> result)
+        private static void Search(T searchFromThis, string search, List<TreeViewItem<int>> result)
         {
             if (string.IsNullOrEmpty(search))
             {
@@ -106,7 +106,7 @@ namespace Reflex.Editor.DebuggingWindow
                 // Matches search?
                 if (current.Name.IndexOf(search, StringComparison.OrdinalIgnoreCase) >= 0)
                 {
-                    result.Add(new TreeViewItem<T>(current.Id, itemDepth, current.Name, current));
+                    result.Add(new TreeViewDataItem<T>(current.Id, itemDepth, current.Name, current));
                 }
 
                 if (current.Children != null && current.Children.Count > 0)
@@ -121,7 +121,7 @@ namespace Reflex.Editor.DebuggingWindow
             SortSearchResult(result);
         }
 
-        private static void SortSearchResult(List<TreeViewItem> rows)
+        private static void SortSearchResult(List<TreeViewItem<int>> rows)
         {
             rows.Sort((x, y) => EditorUtility.NaturalCompare(x.displayName, y.displayName));
         }

@@ -19,7 +19,7 @@ namespace Reflex.Editor.DebuggingWindow
             Calls,
         }
 
-        public MultiColumnTreeView(TreeViewState state, MultiColumnHeader multiColumnHeader, TreeModel<MyTreeElement> model) : base(state, multiColumnHeader, model)
+        public MultiColumnTreeView(TreeViewState<int> state, MultiColumnHeader multiColumnHeader, TreeModel<MyTreeElement> model) : base(state, multiColumnHeader, model)
         {
             rowHeight = RowHeight;
             columnIndexForTreeFoldouts = 0;
@@ -32,7 +32,7 @@ namespace Reflex.Editor.DebuggingWindow
 
         protected override void RowGUI(RowGUIArgs args)
         {
-            var item = (TreeViewItem<MyTreeElement>) args.item;
+            var item = (TreeViewDataItem<MyTreeElement>) args.item;
 
             for (int i = 0; i < args.GetNumVisibleColumns(); ++i)
             {
@@ -52,7 +52,7 @@ namespace Reflex.Editor.DebuggingWindow
             }
         }
 
-        private void CellGUI(Rect cellRect, TreeViewItem<MyTreeElement> item, Column column, ref RowGUIArgs args)
+        private void CellGUI(Rect cellRect, TreeViewDataItem<MyTreeElement> item, Column column, ref RowGUIArgs args)
         {
             TryInitTexture();
             CenterRectUsingSingleLineHeight(ref cellRect);
@@ -85,13 +85,13 @@ namespace Reflex.Editor.DebuggingWindow
             }
         }
 
-        private void DrawName(TreeViewItem item, Rect area, string name)
+        private void DrawName(TreeViewItem<int> item, Rect area, string name)
         {
             area.xMin += GetContentIndent(item);
             GUI.Label(area, name, Styles.RichTextLabel);
         }
 
-        private void DrawContracts(TreeViewItem<MyTreeElement> item, Rect rect, string[] contracts)
+        private void DrawContracts(TreeViewDataItem<MyTreeElement> item, Rect rect, string[] contracts)
         {
             if (contracts == null || contracts.Length == 0 || string.IsNullOrEmpty(contracts[0]))
             {
@@ -135,7 +135,7 @@ namespace Reflex.Editor.DebuggingWindow
             GUI.EndGroup();
         }
 
-        private void DrawItemIcon(Rect area, TreeViewItem<MyTreeElement> item)
+        private void DrawItemIcon(Rect area, TreeViewDataItem<MyTreeElement> item)
         {
             area.xMin += GetContentIndent(item);
 
@@ -149,7 +149,7 @@ namespace Reflex.Editor.DebuggingWindow
             GUI.EndGroup();
         }
 
-        private void DrawItemNameColumn(Rect area, TreeViewItem<MyTreeElement> item, ref RowGUIArgs args)
+        private void DrawItemNameColumn(Rect area, TreeViewDataItem<MyTreeElement> item, ref RowGUIArgs args)
         {
             DrawItemIcon(area, item);
             area.x += 4;
@@ -157,7 +157,7 @@ namespace Reflex.Editor.DebuggingWindow
             base.RowGUI(args);
         }
 
-        protected override bool CanMultiSelect(TreeViewItem item)
+        protected override bool CanMultiSelect(TreeViewItem<int> item)
         {
             return false;
         }
