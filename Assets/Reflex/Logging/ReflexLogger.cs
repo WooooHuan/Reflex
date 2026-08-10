@@ -10,8 +10,15 @@ namespace Reflex.Logging
 
         static ReflexLogger()
         {
-            var reflexSettings = ReflexSettings.Instance;
-            _logLevel = reflexSettings.LogLevel;
+            ReflexSettings.TryGetInstance(out var reflexSettings);
+            Initialize(reflexSettings);
+        }
+
+        internal static void Initialize(ReflexSettings reflexSettings)
+        {
+            _logLevel = reflexSettings != null
+                ? reflexSettings.LogLevel
+                : LogLevel.Info;
             Log($"Reflex LogLevel set to {_logLevel}", LogLevel.Info);
         }
 

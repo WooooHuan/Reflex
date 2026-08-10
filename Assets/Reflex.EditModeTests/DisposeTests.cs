@@ -1,8 +1,10 @@
 using System;
 using FluentAssertions;
 using NUnit.Framework;
+using Reflex.Configuration;
 using Reflex.Core;
 using Reflex.Enums;
+using Reflex.Logging;
 
 namespace Reflex.EditModeTests
 {
@@ -15,6 +17,26 @@ namespace Reflex.EditModeTests
             public void Dispose()
             {
                 Disposed++;
+            }
+        }
+
+        [Test]
+        public void Container_ShouldDispose_WhenReflexSettingsAreUnavailable()
+        {
+            ReflexSettings.TryGetInstance(out var settings);
+
+            try
+            {
+                ReflexLogger.Initialize(null);
+                var container = new ContainerBuilder().Build();
+
+                Action dispose = container.Dispose;
+
+                dispose.Should().NotThrow();
+            }
+            finally
+            {
+                ReflexLogger.Initialize(settings);
             }
         }
 

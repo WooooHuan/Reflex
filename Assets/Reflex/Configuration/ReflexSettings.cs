@@ -15,19 +15,30 @@ namespace Reflex.Configuration
         {
             get
             {
-                if (_instance == null)
-                {
-                    _settingsRequest ??= Resources.LoadAsync<ReflexSettings>("ReflexSettings");
+                TryGetInstance(out var settings);
 
-                    // This stalls execution until the request fully resolves.
-                    // This *should* be faster than non-async loading when project installers have a lot of references.
-                    _instance = (ReflexSettings)_settingsRequest.asset;
-                }
-                
-                Assert.IsNotNull(_instance, "ReflexSettings not found in Resources folder.\n" +
-                                            "Please create ReflexSettings using right mouse button over Resources folder, Create > Reflex > Settings.");
-                return _instance;
+                Assert.IsNotNull(settings, "ReflexSettings not found in Resources folder.\n" +
+                                           "Please create ReflexSettings using right mouse button over Resources folder, Create > Reflex > Settings.");
+                return settings;
             }
+        }
+
+        internal static bool TryGetInstance(out ReflexSettings settings)
+        {
+            if (_instance == null)
+            {
+                if (_settingsRequest == null ||
+                    (_settingsRequest.isDone && _settingsRequest.asset == null))
+                {
+                    _settingsRequest = Resources.LoadAsync<ReflexSettings>("ReflexSettings");
+                }
+
+                // Reading ResourceRequest.asset waits for an in-progress request to finish.
+                _instance = (ReflexSettings)_settingsRequest.asset;
+            }
+
+            settings = _instance;
+            return settings != null;
         }
         
         [field: SerializeField] public LogLevel LogLevel { get; private set; }
